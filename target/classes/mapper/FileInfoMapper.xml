@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akun.demo.mapper.FileInfoMapper">
+    <resultMap id="BaseResultMap" type="com.akun.demo.model.FileInfo">
+      <id column="id" jdbcType="INTEGER" property="id" />
+      <result column="group_name" jdbcType="VARCHAR" property="groupName" />
+      <result column="remote_file_path" jdbcType="VARCHAR" property="remoteFilePath" />
+      <result column="file_size" jdbcType="BIGINT" property="fileSize" />
+      <result column="file_type" jdbcType="VARCHAR" property="fileType" />
+      <result column="old_filename" jdbcType="VARCHAR" property="oldFilename" />
+    </resultMap>
+    <sql id="Base_Column_List">
+      id, group_name, remote_file_path,
+      file_size, file_type, old_filename
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+      select
+      <include refid="Base_Column_List" />
+      from file_info
+      where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from file_info
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.akun.demo.model.FileInfo">
+      insert into file_info (id, group_name, remote_file_path,
+      file_size, file_type, old_filename)
+      values (#{id,jdbcType=INTEGER}, #{groupName,jdbcType=VARCHAR}, #{remoteFilePath,jdbcType=VARCHAR},
+        #{fileSize,jdbcType=BIGINT}, #{fileType,jdbcType=VARCHAR}, #{oldFilename,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.akun.demo.model.FileInfo">
+      insert into file_info
+      <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="id != null">
+          id,
+        </if>
+        <if test="groupName != null">
+          group_name,
+        </if>
+        <if test="remoteFilePath != null">
+          remote_file_path,
+        </if>
+        <if test="fileSize != null">
+          file_size,
+        </if>
+        <if test="fileType != null">
+          file_type,
+        </if>
+        <if test="oldFilename != null">
+          old_filename,
+        </if>
+      </trim>
+      <trim prefix="values (" suffix=")" suffixOverrides=",">
+        <if test="id != null">
+          #{id,jdbcType=INTEGER},
+        </if>
+        <if test="groupName != null">
+          #{groupName,jdbcType=VARCHAR},
+        </if>
+        <if test="remoteFilePath != null">
+          #{remoteFilePath,jdbcType=VARCHAR},
+        </if>
+        <if test="fileSize != null">
+          #{fileSize,jdbcType=BIGINT},
+        </if>
+        <if test="fileType != null">
+          #{fileType,jdbcType=VARCHAR},
+        </if>
+        <if test="oldFilename != null">
+          #{oldFilename,jdbcType=VARCHAR},
+        </if>
+      </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.akun.demo.model.FileInfo">
+      update file_info
+      <set>
+        <if test="groupName != null">
+          group_name = #{groupName,jdbcType=VARCHAR},
+        </if>
+        <if test="remoteFilePath != null">
+          remote_file_path = #{remoteFilePath,jdbcType=VARCHAR},
+        </if>
+        <if test="fileSize != null">
+          file_size = #{fileSize,jdbcType=BIGINT},
+        </if>
+        <if test="fileType != null">
+          file_type = #{fileType,jdbcType=VARCHAR},
+        </if>
+        <if test="oldFilename != null">
+          old_filename = #{oldFilename,jdbcType=VARCHAR},
+        </if>
+      </set>
+      where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.akun.demo.model.FileInfo">
+    update file_info
+    set group_name = #{groupName,jdbcType=VARCHAR},
+      remote_file_path = #{remoteFilePath,jdbcType=VARCHAR},
+      file_size = #{fileSize,jdbcType=BIGINT},
+      file_type = #{fileType,jdbcType=VARCHAR},
+      old_filename = #{oldFilename,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,46 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akun.demo.mapper.MybatisUserFaceInfoMapper">
+    <resultMap id="userFace" type="com.akun.demo.model.domain.UserFaceInfo">
+        <id column="id" property="id" javaType="int"/>
+        <result column="group_id" property="groupId" javaType="java.lang.Integer"/>
+        <result column="face_id" property="faceId" javaType="String"/>
+        <result column="create_time" property="createTime" javaType="java.util.Date"/>
+        <result column="face_feature" property="faceFeature"/>
+    </resultMap>
+
+    <resultMap id="userFace2" type="com.akun.demo.model.dto.FaceUserInfo">
+        <id column="id" property="id" javaType="int"/>
+        <result column="group_id" property="groupId" javaType="java.lang.Integer"/>
+        <result column="face_id" property="faceId" javaType="String"/>
+<!--        <result column="phone_number" property="phoneNumber" javaType="String"/>-->
+        <result column="create_time" property="createTime" javaType="java.util.Date"/>
+        <result column="face_feature" property="faceFeature"/>
+    </resultMap>
+
+
+    <select id="findUserFaceInfoList" resultMap="userFace"  resultType="com.akun.demo.model.domain.UserFaceInfo">
+        SELECT name,create_time from user_face_info
+    </select>
+
+    <!--4、根据ID号查询人脸信息-->
+    <select id="findUserFaceInfoById" resultType="com.akun.demo.model.domain.UserFaceInfo">
+        select id,group_id,face_id,name,age,gender,face_feature,create_time,update_time
+          from user_face_info
+        where id =#{id}
+    </select>
+    <!--6、更新：通过user (更新用户信息)-->
+    <update id="updateUserFaceInfoByMessage" parameterType="com.akun.demo.model.domain.UserFaceInfo">
+      update user_face_info set
+      group_id=#{groupId},face_id=#{faceId},name=#{name},age=#{age},gender=#{gender},face_feature=#{faceFeature}
+      where id = #{id}
+    </update>
+
+    <insert id="insertUserFaceInfo" parameterType="com.akun.demo.model.domain.UserFaceInfo" >
+        INSERT INTO user_face_info (id,group_id,face_id,name,face_feature) VALUES (#{id},#{groupId},#{faceId},#{name},#{faceFeature})
+    </insert>
+    <select id="getUserFaceInfoByGroupId" resultMap="userFace2" parameterType="java.lang.Integer" resultType="com.akun.demo.model.dto.FaceUserInfo">
+        select face_id,name,face_feature from user_face_info
+    </select>
+</mapper>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.akun.demo.mapper.UserMessageMapper">
+    <!--4、根据ID号查询用户信息-->
+    <select id="findByUserMessageId" resultType="com.akun.demo.model.UserMessage">
+        SELECT
+            real_name,gender,age,number,email,
+            group_id,home_address,current_address
+        FROM
+            c_user_message
+        WHERE
+            id = #{userId}
+    </select>
+    <!--5、添加用户：通过user对象进行添加-->
+    <insert id="save" parameterType="com.akun.demo.model.UserMessage">
+        INSERT  INTO c_user_message (id, real_name, gender,age,number, email,group_id,home_address,current_address)
+        values (#{id,jdbcType=INTEGER}, #{realName,jdbcType=VARCHAR}, #{gender,jdbcType=SMALLINT},
+				#{age,jdbcType=INTEGER}, #{number,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
+				#{groupId,jdbcType=INTEGER}, #{homeAddress,jdbcType=VARCHAR}, #{currentAddress,jdbcType=VARCHAR})
+    </insert>
+    <!--6、更新：通过user (更新用户信息)-->
+    <update id="updateUserMessage" parameterType="com.akun.demo.model.UserMessage">
+      UPDATE c_user_message
+      SET real_name = #{realName},gender=#{gender},age=#{age},email=#{email},number=#{number},
+      group_id=#{groupId},home_address=#{homeAddress},current_address=#{currentAddress}
+      WHERE
+        id = #{id}
+    </update>
+    <!--7、删除用户：通过userId-->
+    <delete id="deleteUserByUserMessageId" parameterType="Long">
+        delete from c_user_message where id = #{userId}
+    </delete>
+
+</mapper>

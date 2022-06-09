@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akun.demo.mapper.BlogMapper">
+
+    <!--（1、2、3）语句查询：公用type和user封装（语句）-->
+    <resultMap id="ResultOne" type="com.akun.demo.model.Blog" autoMapping="true">
+      <id property="id" column="bid"/>
+      <!--给User对象：注入值-->
+      <association property="manager" javaType="com.akun.demo.model.Manager">
+        <id property="id" column="uid"/>
+      </association>
+    </resultMap>
+    <resultMap id="ResultTwo" type="com.akun.demo.model.Blog" autoMapping="true">
+      <id column="id" property="id"/>
+      <result property="createTime" column="create_time"/>
+      <result property="updateTime" column="update_time"/>
+      <result property="firstPicture" column="first_picture"/>
+
+      <!--给manager对象：注入值-->
+      <association property="manager" javaType="com.akun.demo.model.Manager">
+        <id property="id" column="user_id"/>
+      </association>
+    </resultMap>
+    <!--2、查询：（最新、不推荐）的num篇文章-->
+    <select id="selNewUpdTile" parameterType="int" resultMap="ResultOne">
+          SELECT
+              b.id 'bid',title,
+              first_picture 'firstPicture',
+              u.id 'uid',
+              u.avatar,
+              b.create_time 'createTime',
+              b.update_time 'updateTime',
+              views
+          FROM
+              c_blog b,
+              c_user u
+          WHERE
+              b.user_id = u.id
+          ORDER BY
+              b.update_time DESC
+              LIMIT #{num}
+      </select>
+    <!--4、查询所有的博客-->
+    <select id="selAllBlog" resultMap="ResultTwo">
+         select * from c_blog
+    </select>
+    <!--8、查询：通过（搜索字符串），模糊查询（标题、内容、描述）包含的所有博客-->
+    <select id="selAllBlogByQueryStr" parameterType="String" resultMap="ResultOne">
+
+      <bind name="myQuery" value="'%'+query+'%'"/>
+      SELECT
+        b.id 'bid',title,first_picture 'firstPicture',u.id 'uid',
+        u.avatar,
+        b.create_time 'createTime',views
+      FROM
+        c_blog b, c_user u
+      WHERE
+        b.user_id = u.id
+      AND
+      (title LIKE #{myQuery}
+      OR content LIKE #{myQuery}
+      )
+    </select>
+    <!--9、更新：通过（博客id）， 更新博客（访问次数+1）-->
+    <update id="updViewsNumById" parameterType="Long">
+        update c_blog set views = views + 1
+        where id = #{id}
+    </update>
+    <!--15、查询：博客总数目-->
+    <select id="selBlogNums" resultType="Long">
+        select count(*) from c_blog
+    </select>
+
+
+    <resultMap id="BaseResultMap" type="com.akun.demo.model.Blog">
+      <id column="id" jdbcType="BIGINT" property="id" />
+      <result column="first_picture" jdbcType="VARCHAR" property="firstPicture" />
+      <result column="title" jdbcType="VARCHAR" property="title" />
+      <result column="user_id" jdbcType="BIGINT" property="manager.id" />
+      <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+      <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+      <result column="views" jdbcType="INTEGER" property="views" />
+    </resultMap>
+    <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.akun.demo.model.Blog">
+      <result column="content" jdbcType="LONGVARCHAR" property="content" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+      id, title, first_picture, user_id, create_time, update_time, views
+    </sql>
+    <sql id="Blob_Column_List">
+      content
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
+      select
+      <include refid="Base_Column_List" />
+      ,
+      <include refid="Blob_Column_List" />
+      from c_blog
+      where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+      delete from c_blog
+      where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.akun.demo.model.Blog">
+        <selectKey resultType="Long" keyProperty="id" order="AFTER">
+            select LAST_INSERT_ID()
+        </selectKey>
+      insert into c_blog (id, first_picture,title,
+        user_id, create_time, update_time,
+        views, content)
+      values (#{id,jdbcType=BIGINT}, #{firstPicture,jdbcType=VARCHAR},#{title,jdbcType=VARCHAR},
+        #{manager.id,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+        #{views,jdbcType=INTEGER}, #{content,jdbcType=LONGVARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.akun.demo.model.Blog">
+      insert into c_blog
+      <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="id != null">
+          id,
+        </if>
+        <if test="title != null">
+          title,
+        </if>
+        <if test="firstPicture != null">
+          first_picture,
+        </if>
+        <if test="userId != null">
+          user_id,
+        </if>
+        <if test="createTime != null">
+          create_time,
+        </if>
+        <if test="updateTime != null">
+          update_time,
+        </if>
+        <if test="views != null">
+          views,
+        </if>
+        <if test="content != null">
+          content,
+        </if>
+      </trim>
+      <trim prefix="values (" suffix=")" suffixOverrides=",">
+        <if test="id != null">
+          #{id,jdbcType=BIGINT},
+        </if>
+        <if test="title != null">
+          #{title,jdbcType=VARCHAR},
+        </if>
+        <if test="firstPicture != null">
+          #{firstPicture,jdbcType=VARCHAR},
+        </if>
+        <if test="userId != null">
+          #{manager.id,jdbcType=BIGINT},
+        </if>
+        <if test="createTime != null">
+          #{createTime,jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateTime != null">
+          #{updateTime,jdbcType=TIMESTAMP},
+        </if>
+        <if test="views != null">
+          #{views,jdbcType=INTEGER},
+        </if>
+        <if test="content != null">
+          #{content,jdbcType=LONGVARCHAR},
+        </if>
+      </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.akun.demo.model.Blog">
+      update c_blog
+      <set>
+        <if test="title != null">
+          title = #{title,jdbcType=VARCHAR},
+        </if>
+        <if test="firstPicture != null">
+          first_picture = #{firstPicture,jdbcType=VARCHAR},
+        </if>
+        <if test="manager != null">
+          user_id = #{manager.id,jdbcType=BIGINT},
+        </if>
+        <if test="createTime != null">
+          create_time = #{createTime,jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateTime != null">
+          update_time = #{updateTime,jdbcType=TIMESTAMP},
+        </if>
+        <if test="views != null">
+          views = #{views,jdbcType=INTEGER},
+        </if>
+        <if test="content != null">
+          content = #{content,jdbcType=LONGVARCHAR},
+        </if>
+      </set>
+      where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.akun.demo.model.Blog">
+      update c_blog
+      set title = #{title,jdbcType=VARCHAR}
+        first_picture = #{firstPicture,jdbcType=VARCHAR},
+        user_id = #{manager.id,jdbcType=BIGINT},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+        views = #{views,jdbcType=INTEGER},
+        content = #{content,jdbcType=LONGVARCHAR}
+      where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.akun.demo.model.Blog">
+      update c_blog
+      set title = #{title,jdbcType=VARCHAR}
+        first_picture = #{firstPicture,jdbcType=VARCHAR},
+        user_id = #{manager.id,jdbcType=BIGINT},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+        views = #{views,jdbcType=INTEGER}
+        content = #{content,jdbcType=LONGVARCHAR}
+      where id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

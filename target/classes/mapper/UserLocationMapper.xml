@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akun.demo.mapper.UserLocationMapper">
+  <resultMap id="BaseResultMap" type="com.akun.demo.model.UserLocation">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="user.id" />
+    <result column="longitude" jdbcType="DECIMAL" property="longitude" />
+    <result column="latitude" jdbcType="DECIMAL" property="latitude" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="morning_temperature" jdbcType="REAL" property="morningTemperature" />
+    <result column="midday_temperature" jdbcType="REAL" property="middayTemperature" />
+    <result column="night_temperature" jdbcType="REAL" property="nightTemperature" />
+    <result column="current_health_status" jdbcType="VARCHAR" property="currentHealthStatus" />
+    <result column="instructions" jdbcType="VARCHAR" property="instructions" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_id, longitude, latitude, create_time,morning_temperature,midday_temperature,night_temperature,current_health_status,instructions
+  </sql>
+  <!--2、查询：（最新）的num篇打卡记录-->
+  <select id="selectAllUserLocation" parameterType="int" resultMap="BaseResultMap">
+          SELECT
+              l.id,
+              l.longitude,
+              l.latitude,
+              l.create_time 'createTime' ,
+              l.user_id,
+              u.id,
+              u.avatar
+          FROM
+              c_user u,
+              c_user_location l
+          WHERE
+              l.user_id = u.id
+          ORDER BY
+              l.create_time DESC
+              LIMIT #{num}
+      </select>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from c_user_location
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from c_user_location
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.akun.demo.model.UserLocation">
+    INSERT INTO c_user_location ( id, user_id, longitude, latitude, create_time, morning_temperature, midday_temperature, night_temperature, current_health_status, instructions)
+    VALUES
+        (#{id,jdbcType=INTEGER}, #{user.id,jdbcType=INTEGER}, #{longitude,jdbcType=DECIMAL},
+    #{latitude,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP},#{morningTemperature,jdbcType=REAL},
+    #{middayTemperature,jdbcType=REAL}, #{nightTemperature,jdbcType=REAL}, #{currentHealthStatus,jdbcType=VARCHAR},
+    #{instructions,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.akun.demo.model.UserLocation">
+    insert into c_user_location
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="user != null">
+        user_id,
+      </if>
+      <if test="longitude != null">
+        longitude,
+      </if>
+      <if test="latitude != null">
+        latitude,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="morningTemperature != null">
+        morning_temperature,
+      </if>
+      <if test="middayTemperature != null">
+        midday_temperature,
+      </if>
+      <if test="nightTemperature != null">
+        night_temperature,
+      </if>
+      <if test="currentHealthStatus != null">
+        current_health_status,
+      </if>
+      <if test="instructions != null">
+        instructions,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="user != null">
+        #{user.id,jdbcType=INTEGER},
+      </if>
+      <if test="longitude != null">
+        #{longitude,jdbcType=DECIMAL},
+      </if>
+      <if test="latitude != null">
+        #{latitude,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="morningTemperature != null">
+        #{morningTemperature,jdbcType=REAL},
+      </if>
+      <if test="middayTemperature != null">
+        #{middayTemperature,jdbcType=REAL},
+      </if>
+      <if test="nightTemperature != null">
+        #{nightTemperature,jdbcType=REAL},
+      </if>
+      <if test="currentHealthStatus != null">
+        #{currentHealthStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="instructions != null">
+        #{instructions,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.akun.demo.model.UserLocation">
+    update c_user_location
+    <set>
+      <if test="user != null">
+        user_id = #{user.id,jdbcType=INTEGER},
+      </if>
+      <if test="longitude != null">
+        longitude = #{longitude,jdbcType=DECIMAL},
+      </if>
+      <if test="latitude != null">
+        latitude = #{latitude,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="morningTemperature != null">
+        morning_temperature = #{morningTemperature,jdbcType=REAL},
+      </if>
+      <if test="middayTemperature != null">
+        midday_temperature = #{middayTemperature,jdbcType=REAL},
+      </if>
+      <if test="nightTemperature != null">
+        night_temperature = #{nightTemperature,jdbcType=REAL},
+      </if>
+      <if test="currentHealthStatus != null">
+        current_health_status = #{currentHealthStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="instructions != null">
+        instructions = #{instructions,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.akun.demo.model.UserLocation">
+    update c_user_location
+    set user_id = #{user.id,jdbcType=INTEGER},
+      longitude = #{longitude,jdbcType=DECIMAL},
+      latitude = #{latitude,jdbcType=DECIMAL},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      morning_temperature = #{morningTemperature,jdbcType=REAL},
+      midday_temperature = #{middayTemperature,jdbcType=REAL},
+      night_temperature = #{nightTemperature,jdbcType=REAL},
+      current_health_status = #{currentHealthStatus,jdbcType=VARCHAR},
+      instructions = #{instructions,jdbcType=VARCHAR},
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
